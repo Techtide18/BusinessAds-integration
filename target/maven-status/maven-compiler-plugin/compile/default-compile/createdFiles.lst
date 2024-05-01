@@ -1,0 +1,5 @@
+com/businessAds/integration/dto/AdDto.class
+com/businessAds/integration/IntegrationApplication.class
+com/businessAds/integration/controller/AuthController.class
+com/businessAds/integration/controller/AdsController.class
+com/businessAds/integration/service/GoogleAdsService.class
