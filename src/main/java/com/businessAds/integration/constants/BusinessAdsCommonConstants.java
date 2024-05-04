@@ -14,6 +14,7 @@ public class BusinessAdsCommonConstants {
 	public static final String CODE_LITERAL = "code";
 	public static final String GRANT_TYPE = "grant_type";
 	public static final String AUTHORIZATION_CODE = "authorization_code";
+	public static final String EMAIL_LITERAL = "email";
 
 
 

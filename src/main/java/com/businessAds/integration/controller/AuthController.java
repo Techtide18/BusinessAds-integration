@@ -1,6 +1,6 @@
 package com.businessAds.integration.controller;
 
-import com.businessAds.integration.service.GoogleAdsService;
+import com.businessAds.integration.services.GoogleAdsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +24,14 @@ public class AuthController {
 
 	@GetMapping(value = "/google")
 	public ModelAndView authenticateUser() {
-		logger.info("Recieved webhook to authenticate the user");
+		//logger.info("Recieved webhook to authenticate the user");
 		return googleAdsService.redirectUserToAuthenticationUrl();
 	}
 
 	@GetMapping("/google/callback")
 	public ResponseEntity<?> authenticateUserCallback(@RequestParam("code") String authorizationCode) {
-		logger.info("Recieved callback webhook to get the tokens for the user");
+
+		//logger.info("Recieved callback webhook to get the tokens for the user");
 		googleAdsService.exchangeAuthorizationCodeForTokensAndSaveUserRefreshTokenInDB(authorizationCode);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
