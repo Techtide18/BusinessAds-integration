@@ -1,27 +1,38 @@
 package com.businessAds.integration.controller;
 
+import com.businessAds.integration.service.GoogleAdsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-	@GetMapping("/googleAuth")
-	public String googleAuthRedirect(@AuthenticationPrincipal OAuth2User principal) {
-		if (principal != null) {
-			return "Authenticated successfully with attributes: " + principal.getAttributes();
-		}
-		return "Authentication failed";
+
+	@Autowired
+	private GoogleAdsService googleAdsService;
+
+	// @shubham add logger here
+	// private Logger logger = new logger();
+
+	@GetMapping(value = "/google")
+	public ModelAndView authenticateUser() {
+		logger.info("Recieved webhook to authenticate the user");
+		return googleAdsService.redirectUserToAuthenticationUrl();
+	}
+
+	@GetMapping("/google/callback")
+	public ResponseEntity<?> authenticateUserCallback(@RequestParam("code") String authorizationCode) {
+		logger.info("Recieved callback webhook to get the tokens for the user");
+		googleAdsService.exchangeAuthorizationCodeForTokensAndSaveUserRefreshTokenInDB(authorizationCode);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }

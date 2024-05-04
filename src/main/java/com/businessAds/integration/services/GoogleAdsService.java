@@ -1,43 +1,84 @@
 package com.businessAds.integration.services;
 
-import com.businessAds.integration.dto.AdDto;
+import com.businessAds.integration.connectors.GoogleApiConnector;
+import com.businessAds.integration.constants.BusinessAdsCommonConstants;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GoogleAdsService {
 
-	private final OAuth2AuthorizedClientService clientService;
-
 	@Autowired
-	public GoogleAdsService(OAuth2AuthorizedClientService clientService) {
-		this.clientService = clientService;
+	GoogleApiConnector googleApiConnector;
+
+	/**
+	 * ModelAndView is used to redirect the user's browser to Google's OAuth 2.0 server
+	 */
+	public ModelAndView redirectUserToAuthenticationUrl() {
+
+		String authenticationUrl = googleApiConnector.getAuthenticationUrl();
+		return new ModelAndView(BusinessAdsCommonConstants.REDIRECT_LITERAL + authenticationUrl);
 	}
 
-	public List<AdDto> getUserAds(String userId) {
-		OAuth2AuthorizedClient client = clientService.loadAuthorizedClient("google", userId);
-		String accessToken = client.getAccessToken().getTokenValue();
+	public void exchangeAuthorizationCodeForTokensAndSaveUserRefreshTokenInDB(String authorizationCode) {
 
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-		HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+		String response = googleApiConnector.exchangeAuthorizationCodeForTokens(authorizationCode);
+		List<String> uniqueIdAndRefreshTokenList = parseResponseAndDecodeIDToken(response);
+		storeRefreshToken(uniqueIdAndRefreshTokenList);
+	}
 
-		ResponseEntity<AdDto[]> response = restTemplate.exchange(
-				"https://googleapis.com/ads/v6/customers/{customerId}/ads",
-				HttpMethod.GET, entity, AdDto[].class, userId);
+	private List<String> parseResponseAndDecodeIDToken(String responseBody) {
 
-		return Arrays.asList(response.getBody());
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			Map<String, Object> tokenResponse = objectMapper.readValue(responseBody,
+					new TypeReference<Map<String, Object>>() {
+					});
+
+			String idToken = (String) tokenResponse.get("id_token");
+			String refreshToken = (String) tokenResponse.get("refresh_token");
+			return decodeIdToken(idToken, refreshToken);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger return new ArrayList<>();
+		}
+	}
+
+	private List<String> decodeIdToken(String idToken, String refreshToken) {
+
+		try {
+			List<String> uniqueIdAndRefreshToken = new ArrayList<>();
+			JWT jwt = JWTParser.parse(idToken);
+			String uniqueId = jwt.getJWTClaimsSet().getSubject();
+			String userEmail = jwt.getJWTClaimsSet().getStringClaim("email");
+
+			uniqueIdAndRefreshToken.add(uniqueId);
+			uniqueIdAndRefreshToken.add(userEmail);
+			uniqueIdAndRefreshToken.add(refreshToken);
+
+			return uniqueIdAndRefreshToken;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger return new ArrayList<>();
+		}
+	}
+
+	private void storeRefreshToken(List<String> uniqueIdsAndRefreshToken) {
+
+		//0-> uniqueId, 1-> email, 3-> refreshToken
+		db.save(uniqueIdsAndRefreshToken.get(0), uniqueIdsAndRefreshToken.get(1), uniqueIdsAndRefreshToken.get(2));
+		//update email and refresh token if auth again for the same user (as email can also change)
+		//UPDATE table t SET t.email = :email, t.refreshToken = :refreshToken WHERE t.uniqueId = :uniqueId
+		//findById().orElse(new User())
 	}
 
 }
