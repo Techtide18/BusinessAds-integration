@@ -1,5 +1,6 @@
 package com.businessAds.integration.controller;
 
+import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dto.AdDto;
 import com.businessAds.integration.services.GoogleAdsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class AdsController {
 	@GetMapping("/{userId}")
 	public ResponseEntity<List<AdDto>> getUserAds(@PathVariable String userId) {
 		List<AdDto> ads = googleAdsService.getUserAds(userId);
+		String s = BusinessAdsCommonConstants.GOOGLE_CLIENT_ID;
 		return ResponseEntity.ok(ads);
 	}
 
