@@ -1,7 +1,7 @@
 package com.businessAds.integration.controller;
 
 import com.businessAds.integration.dto.AdDto;
-import com.businessAds.integration.service.GoogleAdsService;
+import com.businessAds.integration.services.GoogleAdsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
