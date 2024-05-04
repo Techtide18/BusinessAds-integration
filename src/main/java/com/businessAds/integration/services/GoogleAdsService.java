@@ -1,4 +1,4 @@
-package com.businessAds.integration.service;
+package com.businessAds.integration.services;
 
 import com.businessAds.integration.dto.AdDto;
 import org.springframework.beans.factory.annotation.Autowired;
