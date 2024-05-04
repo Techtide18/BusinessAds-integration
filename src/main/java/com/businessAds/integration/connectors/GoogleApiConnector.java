@@ -1,7 +1,7 @@
 package com.businessAds.integration.connectors;
 
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.businessAds.integration.dto.google.GoogleTokenDTO;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -12,8 +12,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class GoogleApiConnector {
 
-	@Autowired
-	private RestTemplate restTemplate;
+//	@Autowired
+//	private RestTemplate restTemplate;
 
 	//use @value here
 	private String authUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -28,7 +28,8 @@ public class GoogleApiConnector {
 	private String clientSecret = "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";
 
 	//use @value here
-	private String redirectUri = "@our.base.url@/auth/google/callback";
+	private String redirectUri = "http://localhost:8080/auth/google/callback";
+
 
 	//use @value here
 	//included multiple scopes separated by spaces as google needs
@@ -48,7 +49,7 @@ public class GoogleApiConnector {
 		return builder.toUriString();
 	}
 
-	public String exchangeAuthorizationCodeForTokens(String authorizationCode) {
+	public GoogleTokenDTO exchangeAuthorizationCodeForTokens(String authorizationCode) {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -59,22 +60,11 @@ public class GoogleApiConnector {
 		map.add(BusinessAdsCommonConstants.REDIRECT_URI, redirectUri);
 		map.add(BusinessAdsCommonConstants.GRANT_TYPE, BusinessAdsCommonConstants.AUTHORIZATION_CODE);
 
+		RestTemplate restTemplate = new RestTemplate();
 		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
-		ResponseEntity<String> responseEntity = restTemplate.exchange(tokenUrl, HttpMethod.GET, entity, String.class);
+		ResponseEntity<GoogleTokenDTO> responseEntity = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity, GoogleTokenDTO.class);
 
 		return responseEntity != null ? responseEntity.getBody() : null;
 	}
-
-	//	public MindbodyClassResponse fetchClasses(String startDate, String endDate, BusinessIntegration businessIntegration,
-//			String token) {
-//		HttpEntity<?> httpEntity = new HttpEntity<>(getHttpHeaders(businessIntegration, token));
-//		String classesURI = getClassUrl(businessIntegration, startDate, endDate);
-//		logger.info("URI to fetchClasses details for businessNumber {} is {}", businessIntegration.getBusinessNumber(),
-//				classesURI);
-//		ResponseEntity<MindbodyClassResponse> responseEntity = restTemplate.exchange(classesURI, HttpMethod.GET,
-//				httpEntity, MindbodyClassResponse.class);
-//		return responseEntity != null ? responseEntity.getBody() : null;
-//	}
-
 
 }
