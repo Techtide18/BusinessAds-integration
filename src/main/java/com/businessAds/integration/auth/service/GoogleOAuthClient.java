@@ -28,6 +28,7 @@ public class GoogleOAuthClient {
 	private ClientInformationRepository clientInformationRepository;
 
 	public String getAccessToken(String email) {
+		//if reddis dosnt contain the token then hit api or retuen token from here
 		ClientInformation clientInfo = clientInformationRepository.findByEmail(email);
 		GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(clientInfo.getRefreshToken());
 		String accessToken = accessTokenResponse.getAccessToken();

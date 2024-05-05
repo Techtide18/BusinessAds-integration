@@ -39,13 +39,12 @@ public class GoogleAdsService {
 	public void exchangeAuthorizationCodeForTokensAndSaveUserRefreshTokenInDB(String authorizationCode) {
 
 		GoogleTokenDTO response = googleApiConnector.exchangeAuthorizationCodeForTokens(authorizationCode);
-		Pair<String, String> uniqueIdsAndEmailPair = decodeAndGetUniqueIdsFromJwt(response.getIdToken());
+		Pair<String, String> uniqueIdAndEmailPair = decodeAndGetUniqueIdFromJwt(response.getIdToken());
 		//add in redis/aerospike -> what will be the uniqueId (email_accessToken_value)?
-		storeRefreshTokenInDb(uniqueIdsAndEmailPair, response.getRefreshToken());
-		String accessToken = getAccessToken(uniqueIdsAndEmailPair.getLeft());
+		storeRefreshTokenInDb(uniqueIdAndEmailPair, response.getRefreshToken());
 	}
 
-	public Pair<String, String> decodeAndGetUniqueIdsFromJwt(String idToken) {
+	public Pair<String, String> decodeAndGetUniqueIdFromJwt(String idToken) {
 
 		try {
 			JWT jwt = JWTParser.parse(idToken);
@@ -70,7 +69,6 @@ public class GoogleAdsService {
 
 	//test method
 	public String getAccessToken(String email) {
-		//if reddis dosnt contain the token then hit api or retuen token from here
 		return googleOAuthClient.getAccessToken(email);
 	}
 
