@@ -70,11 +70,10 @@ public class GoogleAdsService {
 	}
 
 	//test method
-	public String getAccessToken(String uniqueId) {
+	public String getAccessToken(String email) {
 		//if reddis dosnt contain the token then hit api or retuen token from here
-		ClientInformation clientInfo = clientInformationRepository.findByUniqueId(uniqueId);
-		String accessToken = googleOAuthClient.getAccessToken(clientInfo.getRefreshToken());
-		if(StringUtils.isBlank(accessToken)){
+		String accessToken = googleOAuthClient.getAccessToken(email);
+		if (StringUtils.isBlank(accessToken)) {
 			//logger.info() -> null access token
 		}
 		return accessToken;

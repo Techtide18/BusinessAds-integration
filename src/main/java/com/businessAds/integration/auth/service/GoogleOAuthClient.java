@@ -1,8 +1,11 @@
 package com.businessAds.integration.auth.service;
 
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
+import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
+import com.businessAds.integration.pojo.ClientInformation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,8 +24,12 @@ public class GoogleOAuthClient {
 	//use @value here
 	private String clientSecret = "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";
 
-	public String getAccessToken(String refreshToken) {
-		GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(refreshToken);
+	@Autowired
+	private ClientInformationRepository clientInformationRepository;
+
+	public String getAccessToken(String email) {
+		ClientInformation clientInfo = clientInformationRepository.findByEmail(email);
+		GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(clientInfo.getRefreshToken());
 		String accessToken = accessTokenResponse.getAccessToken();
 		if (StringUtils.isNotBlank(accessToken)) {
 			return BusinessAdsCommonConstants.BEARER_PREFIX + accessToken;

@@ -10,4 +10,6 @@ public interface ClientInformationRepository extends JpaRepository<ClientInforma
 
 	ClientInformation findByUniqueId(String uniqueId);
 
+	ClientInformation findByEmail(String email);
+
 }
