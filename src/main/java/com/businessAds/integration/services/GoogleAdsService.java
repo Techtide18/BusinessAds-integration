@@ -65,7 +65,6 @@ public class GoogleAdsService {
 			clientInfo = new ClientInformation(uniqueIdsAndEmailPair.getLeft(), uniqueIdsAndEmailPair.getRight(),
 					refreshToken);
 		}
-
 		clientInformationRepository.save(clientInfo);
 	}
 

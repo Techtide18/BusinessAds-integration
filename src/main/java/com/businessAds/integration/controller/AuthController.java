@@ -23,14 +23,14 @@ public class AuthController {
 
 	@GetMapping(value = "/google")
 	public ModelAndView authenticateUser() {
-		//logger.info("Recieved webhook to authenticate the user");
+		//logger.info("Received webhook to authenticate the user");
 		return googleAdsService.redirectUserToAuthenticationUrl();
 	}
 
 	@GetMapping("/google/callback")
 	public ResponseEntity<?> authenticateUserCallback(@RequestParam("code") String authorizationCode) {
 
-		//logger.info("Recieved callback webhook to get the tokens for the user");
+		//logger.info("Received callback webhook to get the tokens for the user");
 		googleAdsService.exchangeAuthorizationCodeForTokensAndSaveUserRefreshTokenInDB(authorizationCode);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
