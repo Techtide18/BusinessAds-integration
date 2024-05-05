@@ -15,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/auth")
 public class AuthController {
 
-
 	@Autowired
 	private GoogleAdsService googleAdsService;
 
