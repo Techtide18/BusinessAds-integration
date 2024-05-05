@@ -3,6 +3,7 @@ package com.businessAds.integration.connectors;
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
 import org.springframework.http.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -59,9 +60,9 @@ public class GoogleApiConnector {
 		map.add(BusinessAdsCommonConstants.CLIENT_SECRET, clientSecret);
 		map.add(BusinessAdsCommonConstants.REDIRECT_URI, redirectUri);
 		map.add(BusinessAdsCommonConstants.GRANT_TYPE, BusinessAdsCommonConstants.AUTHORIZATION_CODE);
+		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
 		RestTemplate restTemplate = new RestTemplate();
-		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 		ResponseEntity<GoogleTokenDTO> responseEntity = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity, GoogleTokenDTO.class);
 
 		return responseEntity != null ? responseEntity.getBody() : null;

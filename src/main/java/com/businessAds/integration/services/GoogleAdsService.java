@@ -1,20 +1,19 @@
 package com.businessAds.integration.services;
 
+import com.businessAds.integration.auth.service.GoogleOAuthClient;
 import com.businessAds.integration.connectors.GoogleApiConnector;
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
 import com.businessAds.integration.pojo.ClientInformation;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @Service
 public class GoogleAdsService {
@@ -24,6 +23,9 @@ public class GoogleAdsService {
 
 	@Autowired
 	GoogleApiConnector googleApiConnector;
+
+	@Autowired
+	GoogleOAuthClient googleOAuthClient;
 
 	/**
 	 * ModelAndView is used to redirect the user's browser to Google's OAuth 2.0 server
@@ -57,14 +59,24 @@ public class GoogleAdsService {
 
 	private void storeRefreshTokenInDb(Pair<String, String> uniqueIdsAndEmailPair, String refreshToken) {
 
-		ClientInformation clientInfo = clientInformationRepository.findById(uniqueIdsAndEmailPair.getLeft())
-				.orElse(new ClientInformation());
-
-		clientInfo.setUniqueId(uniqueIdsAndEmailPair.getLeft());
-		clientInfo.setEmail(uniqueIdsAndEmailPair.getRight());
-		clientInfo.setRefreshToken(refreshToken);
+		ClientInformation clientInfo = clientInformationRepository.findByUniqueId(uniqueIdsAndEmailPair.getLeft());
+		if (ObjectUtils.isEmpty(clientInfo)) {
+			clientInfo = new ClientInformation(uniqueIdsAndEmailPair.getLeft(), uniqueIdsAndEmailPair.getRight(),
+					refreshToken);
+		}
 
 		clientInformationRepository.save(clientInfo);
+	}
+
+	//test method
+	public String getAccessToken(String uniqueId) {
+		//if reddis dosnt contain the token then hit api or retuen token from here
+		ClientInformation clientInfo = clientInformationRepository.findByUniqueId(uniqueId);
+		String accessToken = googleOAuthClient.getAccessToken(clientInfo.getRefreshToken());
+		if(StringUtils.isBlank(accessToken)){
+			//logger.info() -> null access token
+		}
+		return accessToken;
 	}
 
 }
