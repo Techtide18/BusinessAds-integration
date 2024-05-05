@@ -12,6 +12,15 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class GoogleOAuthClient {
 
+	//use @value here
+	private String tokenUrl = "https://oauth2.googleapis.com/token";
+
+	//use @value here
+	private String clientId = "740815914417-o9du9pqif9ppj5e6t22vs6qhon9imeuf.apps.googleusercontent.com";
+
+	//use @value here
+	private String clientSecret = "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";
+
 	public String getAccessToken(String refreshToken) {
 		GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(refreshToken);
 		String accessToken = accessTokenResponse.getAccessToken();
@@ -38,4 +47,5 @@ public class GoogleOAuthClient {
 
 		return responseEntity != null ? responseEntity.getBody() : null;
 	}
+	
 }
