@@ -42,6 +42,7 @@ public class GoogleAdsService {
 		Pair<String, String> uniqueIdsAndEmailPair = decodeAndGetUniqueIdsFromJwt(response.getIdToken());
 		//add in redis/aerospike -> what will be the uniqueId (email_accessToken_value)?
 		storeRefreshTokenInDb(uniqueIdsAndEmailPair, response.getRefreshToken());
+		String at = getAccessToken(uniqueIdsAndEmailPair.getLeft());
 	}
 
 	public Pair<String, String> decodeAndGetUniqueIdsFromJwt(String idToken) {

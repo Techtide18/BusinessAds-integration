@@ -47,5 +47,5 @@ public class GoogleOAuthClient {
 
 		return responseEntity != null ? responseEntity.getBody() : null;
 	}
-	
+
 }
