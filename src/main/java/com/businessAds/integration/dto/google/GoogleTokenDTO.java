@@ -14,7 +14,7 @@ public class GoogleTokenDTO implements Serializable {
 	private String accessToken;
 
 	@JsonProperty("expires_in")
-	private Integer expiresIn;
+	private Long expiresIn;
 
 	@JsonProperty("refresh_token")
 	private String refreshToken;
