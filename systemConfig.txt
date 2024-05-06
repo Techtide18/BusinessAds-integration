@@ -1,0 +1,12 @@
+
+redis setup -
+download redis - brew install redis
+download redis gui - https://redis.io/insight/#insight-form
+start redis server - redis-server --> connect with local host from gui
+redis is up and running
+
+mysql setup -
+download mysql https://dev.mysql.com/downloads/mysql/
+start server - sudo /usr/local/mysql/support-files/mysql.server start (your path to mysql server file)
+run - mysql -u root -p --> sql cli is connected
+
