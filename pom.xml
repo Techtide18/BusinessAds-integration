@@ -19,6 +19,7 @@
         <google-ads.version>31.0.0</google-ads.version>
         <lombok.version>1.18.24</lombok.version>
         <spring-boot-starter-data-redis.version>3.2.0</spring-boot-starter-data-redis.version>
+        <spring-boot-starter-webflux.version>3.2.5</spring-boot-starter-webflux.version>
     </properties>
     <dependencies>
         <dependency>
@@ -73,6 +74,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+            <version>${spring-boot-starter-webflux.version}</version>
         </dependency>
 
     </dependencies>
