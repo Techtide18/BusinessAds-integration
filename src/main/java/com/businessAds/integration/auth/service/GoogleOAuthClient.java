@@ -4,38 +4,48 @@ import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
 import com.businessAds.integration.pojo.ClientInformation;
+import com.businessAds.integration.services.impl.AccessTokenService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
 public class GoogleOAuthClient {
 
-	//use @value here
-	private String tokenUrl = "https://oauth2.googleapis.com/token";
+	@Value("${google.token.url}")
+	private String tokenUrl;
 
-	//use @value here
-	private String clientId = "740815914417-o9du9pqif9ppj5e6t22vs6qhon9imeuf.apps.googleusercontent.com";
+	@Value("${google.client.id}")
+	private String clientId;
 
-	//use @value here
-	private String clientSecret = "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";
+	@Value("${google.client.secret}")
+	private String clientSecret;
 
 	@Autowired
 	private ClientInformationRepository clientInformationRepository;
 
+	@Autowired
+	private AccessTokenService accessTokenService;
+
 	public String getAccessToken(String email) {
-		//if reddis dosnt contain the token then hit api or retuen token from here
-		ClientInformation clientInfo = clientInformationRepository.findByEmail(email);
-		GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(clientInfo.getRefreshToken());
-		String accessToken = accessTokenResponse.getAccessToken();
-		if (StringUtils.isNotBlank(accessToken)) {
-			return BusinessAdsCommonConstants.BEARER_PREFIX + accessToken;
+		String accessTokenFromRedis = accessTokenService.getAccessTokenFromRedis(email).getAccessToken();
+		if (StringUtils.isBlank(accessTokenFromRedis)) {
+			ClientInformation clientInfo = clientInformationRepository.findByEmail(email);
+			GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(clientInfo.getRefreshToken());
+			String accessToken = accessTokenResponse.getAccessToken();
+			if (StringUtils.isNotBlank(accessToken)) {
+				return BusinessAdsCommonConstants.BEARER_PREFIX + accessToken;
+			}
+			return null;
 		}
-		return null;
+		return accessTokenFromRedis;
 	}
 
 	private GoogleTokenDTO getAccessTokenResponseBody(String refreshToken) {

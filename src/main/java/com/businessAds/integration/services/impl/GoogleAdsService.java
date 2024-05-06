@@ -3,6 +3,7 @@ package com.businessAds.integration.services.impl;
 import com.businessAds.integration.auth.service.GoogleOAuthClient;
 import com.businessAds.integration.connectors.GoogleApiConnector;
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
+import com.businessAds.integration.controller.AuthController;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
 import com.businessAds.integration.pojo.ClientInformation;
@@ -11,6 +12,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class GoogleAdsService {
 
 	@Autowired
-	private ClientInformationRepository clientInformationRepository;
+	ClientInformationRepository clientInformationRepository;
 
 	@Autowired
 	GoogleApiConnector googleApiConnector;
@@ -31,6 +34,8 @@ public class GoogleAdsService {
 
 	@Autowired
 	AccessTokenService accessTokenService;
+
+	Logger logger = LoggerFactory.getLogger(GoogleAdsService.class);
 
 	/**
 	 * ModelAndView is used to redirect the user's browser to Google's OAuth 2.0 server
@@ -60,7 +65,7 @@ public class GoogleAdsService {
 			String userEmail = jwt.getJWTClaimsSet().getStringClaim(BusinessAdsCommonConstants.EMAIL_LITERAL);
 			return Pair.of(uniqueId, userEmail);
 		} catch (Exception e) {
-			//logger.error("Failed to decode ID token: {}", e.getMessage(), e);
+			logger.error("Failed to decode ID token: {}", e.getMessage(), e);
 			return null;
 		}
 	}
@@ -76,7 +81,6 @@ public class GoogleAdsService {
 		clientInformationRepository.save(clientInfo);
 	}
 
-	//test method
 	public String getAccessToken(String email) {
 		return googleOAuthClient.getAccessToken(email);
 	}
