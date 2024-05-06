@@ -2,6 +2,7 @@ package com.businessAds.integration.connectors;
 
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -13,8 +14,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class GoogleApiConnector {
 
-//	@Autowired
-//	private RestTemplate restTemplate;
+	@Autowired
+	private RestTemplate restTemplate;
 
 	@Value("${google.auth.url}")
 	private String authUrl;
@@ -60,7 +61,6 @@ public class GoogleApiConnector {
 		map.add(BusinessAdsCommonConstants.GRANT_TYPE, BusinessAdsCommonConstants.AUTHORIZATION_CODE);
 		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
-		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<GoogleTokenDTO> responseEntity = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity, GoogleTokenDTO.class);
 
 		return responseEntity != null ? responseEntity.getBody() : null;

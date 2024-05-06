@@ -41,10 +41,4 @@ public class AuthController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@GetMapping("/save/redis")
-	public void saveinRedis(){
-		redisServiceImpl.setOpsForValueWithExpiry("check", "accesstoken",
-				111L, TimeUnit.MINUTES);
-	}
-
 }
