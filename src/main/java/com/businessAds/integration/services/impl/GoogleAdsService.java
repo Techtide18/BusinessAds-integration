@@ -1,4 +1,4 @@
-package com.businessAds.integration.services;
+package com.businessAds.integration.services.impl;
 
 import com.businessAds.integration.auth.service.GoogleOAuthClient;
 import com.businessAds.integration.connectors.GoogleApiConnector;
@@ -6,6 +6,7 @@ import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
 import com.businessAds.integration.pojo.ClientInformation;
+import com.businessAds.integration.services.RedisService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -14,6 +15,8 @@ import com.nimbusds.jwt.JWTParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class GoogleAdsService {
@@ -26,6 +29,9 @@ public class GoogleAdsService {
 
 	@Autowired
 	GoogleOAuthClient googleOAuthClient;
+
+	@Autowired
+	AccessTokenService accessTokenService;
 
 	/**
 	 * ModelAndView is used to redirect the user's browser to Google's OAuth 2.0 server
@@ -40,7 +46,10 @@ public class GoogleAdsService {
 
 		GoogleTokenDTO response = googleApiConnector.exchangeAuthorizationCodeForTokens(authorizationCode);
 		Pair<String, String> uniqueIdAndEmailPair = decodeAndGetUniqueIdFromJwt(response.getIdToken());
-		//add in redis/aerospike -> what will be the uniqueId (email_accessToken_value)?
+
+		accessTokenService.setAccessTokenInRedis(uniqueIdAndEmailPair.getLeft(), response.getAccessToken(),
+				response.getExpiresIn(), TimeUnit.SECONDS);
+
 		storeRefreshTokenInDb(uniqueIdAndEmailPair, response.getRefreshToken());
 	}
 
@@ -60,6 +69,7 @@ public class GoogleAdsService {
 	private void storeRefreshTokenInDb(Pair<String, String> uniqueIdsAndEmailPair, String refreshToken) {
 
 		ClientInformation clientInfo = clientInformationRepository.findByUniqueId(uniqueIdsAndEmailPair.getLeft());
+
 		if (ObjectUtils.isEmpty(clientInfo)) {
 			clientInfo = new ClientInformation(uniqueIdsAndEmailPair.getLeft(), uniqueIdsAndEmailPair.getRight(),
 					refreshToken);

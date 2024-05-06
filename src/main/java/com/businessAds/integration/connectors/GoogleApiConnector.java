@@ -2,8 +2,8 @@ package com.businessAds.integration.connectors;
 
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -16,25 +16,23 @@ public class GoogleApiConnector {
 //	@Autowired
 //	private RestTemplate restTemplate;
 
-	//use @value here
-	private String authUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+	@Value("${google.auth.url}")
+	private String authUrl;
 
-	//use @value here
-	private String tokenUrl = "https://oauth2.googleapis.com/token";
+	@Value("${google.token.url}")
+	private String tokenUrl;
 
-	//use @value here
-	private String clientId = "740815914417-o9du9pqif9ppj5e6t22vs6qhon9imeuf.apps.googleusercontent.com";
+	@Value("${google.client.id}")
+	private String clientId;
 
-	//use @value here
-	private String clientSecret = "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";
+	@Value("${google.client.secret}")
+	private String clientSecret;
 
-	//use @value here
-	private String redirectUri = "http://localhost:8080/auth/google/callback";
+	@Value("${google.redirect.uri}")
+	private String redirectUri;
 
-
-	//use @value here
-	//included multiple scopes separated by spaces as google needs
-	public static final String GOOGLE_ADS_API_SCOPE = "https://www.googleapis.com/auth/adwords openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
+	@Value("${google.auth.scope}")
+	private String GOOGLE_ADS_API_SCOPE;
 
 
 	public String getAuthenticationUrl() {
