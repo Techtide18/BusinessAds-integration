@@ -65,8 +65,9 @@ public class GoogleAdsService {
 			String userEmail = jwt.getJWTClaimsSet().getStringClaim(BusinessAdsCommonConstants.EMAIL_LITERAL);
 			return Pair.of(uniqueId, userEmail);
 		} catch (Exception e) {
-			logger.error("Failed to decode ID token: {}", e.getMessage(), e);
-			return null;
+			String exceptionReason = "Failed to decode ID token, e: " + e.getMessage();
+			logger.error(exceptionReason, e);
+			throw new RuntimeException(exceptionReason);
 		}
 	}
 
