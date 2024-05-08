@@ -6,6 +6,7 @@ import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.controller.AuthController;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
+import com.businessAds.integration.dto.google.ResourceNamesDTO;
 import com.businessAds.integration.pojo.ClientInformation;
 import com.businessAds.integration.services.RedisService;
 import org.apache.commons.lang3.ObjectUtils;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -37,9 +39,10 @@ public class GoogleAdsService {
 
 	Logger logger = LoggerFactory.getLogger(GoogleAdsService.class);
 
-	/**
-	 * ModelAndView is used to redirect the user's browser to Google's OAuth 2.0 server
-	 */
+	private String getAccessToken(String email) {
+		return googleOAuthClient.getAccessToken(email);
+	}
+
 	public ModelAndView redirectUserToAuthenticationUrl() {
 
 		String authenticationUrl = googleApiConnector.getAuthenticationUrl();
@@ -51,8 +54,9 @@ public class GoogleAdsService {
 		GoogleTokenDTO response = googleApiConnector.exchangeAuthorizationCodeForTokens(authorizationCode);
 		Pair<String, String> uniqueIdAndEmailPair = decodeAndGetUniqueIdFromJwt(response.getIdToken());
 
-		accessTokenService.setAccessTokenInRedis(uniqueIdAndEmailPair.getLeft(), response.getAccessToken(),
-				response.getExpiresIn(), TimeUnit.SECONDS);
+		String redisKey = uniqueIdAndEmailPair.getRight() + BusinessAdsCommonConstants.GOOGLE;
+		accessTokenService.setAccessTokenInRedis(redisKey, response.getAccessToken(), response.getExpiresIn(),
+				TimeUnit.SECONDS);
 
 		storeRefreshTokenInDb(uniqueIdAndEmailPair, response.getRefreshToken());
 	}
@@ -82,9 +86,12 @@ public class GoogleAdsService {
 		clientInformationRepository.save(clientInfo);
 	}
 
-	public String getAccessToken(String email) {
-		return googleOAuthClient.getAccessToken(email);
+	public ResourceNamesDTO getAdAccounts(String email) {
+		String accessToken = getAccessToken(email);
+		ResourceNamesDTO adAccounts = googleApiConnector.getAdAccounts(accessToken);
+		return adAccounts;
 	}
+
 
 }
 
