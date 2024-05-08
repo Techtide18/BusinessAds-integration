@@ -2,6 +2,7 @@ package com.businessAds.integration.auth.service;
 
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dao.ClientInformationRepository;
+import com.businessAds.integration.dto.AccessToken;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
 import com.businessAds.integration.pojo.ClientInformation;
 import com.businessAds.integration.services.impl.AccessTokenService;
@@ -35,8 +36,8 @@ public class GoogleOAuthClient {
 	private AccessTokenService accessTokenService;
 
 	public String getAccessToken(String email) {
-		String accessTokenFromRedis = accessTokenService.getAccessTokenFromRedis(email).getAccessToken();
-		if (StringUtils.isBlank(accessTokenFromRedis)) {
+		AccessToken accessTokenFromRedis = accessTokenService.getAccessTokenFromRedis(email);
+		if (accessTokenFromRedis == null) {
 			ClientInformation clientInfo = clientInformationRepository.findByEmail(email);
 			GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(clientInfo.getRefreshToken());
 			String accessToken = accessTokenResponse.getAccessToken();
@@ -45,7 +46,7 @@ public class GoogleOAuthClient {
 			}
 			return null;
 		}
-		return accessTokenFromRedis;
+		return accessTokenFromRedis.getAccessToken();
 	}
 
 	private GoogleTokenDTO getAccessTokenResponseBody(String refreshToken) {

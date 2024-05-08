@@ -2,6 +2,7 @@ package com.businessAds.integration.connectors;
 
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dto.google.GoogleTokenDTO;
+import com.businessAds.integration.dto.google.ResourceNamesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -35,6 +36,11 @@ public class GoogleApiConnector {
 	@Value("${google.auth.scope}")
 	private String GOOGLE_ADS_API_SCOPE;
 
+	@Value("${google.customers.url}")
+	private String customersUri;
+
+	@Value("${google.developer.token}")
+	private String GOOGLE_DEV_TOKEN;
 
 	public String getAuthenticationUrl() {
 
@@ -61,9 +67,23 @@ public class GoogleApiConnector {
 		map.add(BusinessAdsCommonConstants.GRANT_TYPE, BusinessAdsCommonConstants.AUTHORIZATION_CODE);
 		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
-		ResponseEntity<GoogleTokenDTO> responseEntity = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity, GoogleTokenDTO.class);
-
+		ResponseEntity<GoogleTokenDTO> responseEntity = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity,
+				GoogleTokenDTO.class);
 		return responseEntity != null ? responseEntity.getBody() : null;
 	}
 
+	public ResourceNamesDTO getAdAccounts(String accessToken) {
+
+		String url = customersUri + ":listAccessibleCustomers";
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
+		headers.add(BusinessAdsCommonConstants.DEVELOPER_TOKEN, GOOGLE_DEV_TOKEN);
+		HttpEntity<String> entity = new HttpEntity<>(headers);
+
+		ResponseEntity<ResourceNamesDTO> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
+				ResourceNamesDTO.class);
+		return responseEntity != null ? responseEntity.getBody() : null;
+
+	}
 }
