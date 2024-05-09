@@ -32,19 +32,5 @@ public class AdsController {
 		return new ResponseEntity<>(adAccounts, HttpStatus.OK);
 	}
 
-//	@GetMapping("/google/campaigns")
-//	public ResponseEntity<String> getCampaigns(@RequestParam("email") String email,
-//			@RequestParam("customerId") String customerId) {
-//		String campaigns = googleAdsService.getCampaigns(accessToken, customerId);
-//		return new ResponseEntity<>(campaigns, HttpStatus.OK);
-//	}
-//
-//	@GetMapping("/google/ads")
-//	public ResponseEntity<String> getAds(@RequestParam("email") String email,
-//			@RequestParam("customerId") String customerId, @RequestParam("campaignId") String campaignId) {
-//		String ads = googleAdsService.getAds(accessToken, customerId, campaignId);
-//		return new ResponseEntity<>(ads, HttpStatus.OK);
-//	}
-
 
 }
