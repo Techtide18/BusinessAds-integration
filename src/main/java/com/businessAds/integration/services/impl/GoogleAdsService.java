@@ -5,10 +5,10 @@ import com.businessAds.integration.connectors.GoogleApiConnector;
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.controller.AuthController;
 import com.businessAds.integration.dao.ClientInformationRepository;
-import com.businessAds.integration.dto.google.GoogleTokenDTO;
-import com.businessAds.integration.dto.google.ResourceNamesDTO;
+import com.businessAds.integration.dto.google.*;
 import com.businessAds.integration.pojo.ClientInformation;
 import com.businessAds.integration.services.RedisService;
+import com.businessAds.integration.utils.GoogleUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import com.nimbusds.jwt.JWT;
@@ -16,6 +16,9 @@ import com.nimbusds.jwt.JWTParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -92,6 +95,37 @@ public class GoogleAdsService {
 		return adAccounts;
 	}
 
+	public String createBudget(String email, String customerId, long amountMicros) {
+		String accessToken = getAccessToken(email);
+		BudgetPayloadDTO budgetPayloadDTO = new BudgetPayloadDTO("Test Budget", amountMicros, "STANDARD");
+		String budget = googleApiConnector.createBudget(accessToken, customerId, budgetPayloadDTO);
+		return budget;
+	}
+
+	public String createCampaign(String email, String customerId, String budgetId) {
+		String accessToken = getAccessToken(email);
+		BiddingStrategyConfigurationDTO biddingStrategyConfig = new BiddingStrategyConfigurationDTO("MANUAL_CPC");
+		CampaignPayloadDTO campaignPayloadDTO = new CampaignPayloadDTO("Test Campaign", "SEARCH", "PAUSED", budgetId,
+				biddingStrategyConfig);
+		String campaign = googleApiConnector.createCampaign(accessToken, customerId, campaignPayloadDTO);
+		return campaign;
+	}
+
+	public String createAdGroup(String email, String customerId, String campaignId) {
+		String accessToken = getAccessToken(email);
+		AdGroupPayloadDTO adGroupPayloadDTO = new AdGroupPayloadDTO("Test Ad Group", campaignId, "ENABLED",
+				"SEARCH_STANDARD", 1000000L);
+		String adGroup = googleApiConnector.createAdGroup(accessToken, customerId, adGroupPayloadDTO);
+		return adGroup;
+	}
+
+	public String createAd(String email, String customerId, String adGroupId, String title, String imageUrl,
+			String finalUrl, String phoneNumber) {
+		String accessToken = getAccessToken(email);
+		AdPayloadDTO adPayload = GoogleUtils.constructAdPayload(adGroupId, title, imageUrl, finalUrl, phoneNumber);
+		String ad = googleApiConnector.createAd(accessToken, customerId, adPayload);
+		return ad;
+	}
 
 }
 
