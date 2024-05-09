@@ -9,6 +9,7 @@ import com.businessAds.integration.dto.google.*;
 import com.businessAds.integration.pojo.ClientInformation;
 import com.businessAds.integration.services.RedisService;
 import com.businessAds.integration.utils.GoogleUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import com.nimbusds.jwt.JWT;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -119,10 +121,13 @@ public class GoogleAdsService {
 		return adGroup;
 	}
 
-	public String createAd(String email, String customerId, String adGroupId, String title, String imageUrl,
-			String finalUrl, String phoneNumber) {
+	public String createAd(String email, String adType, String customerId, String adGroupId, String title,
+			String description, String imageUrl, String finalUrl, String videoId, String productId, String businessName,
+			String callToAction, String phoneNumber, String countryCode, String appId, String appStore) {
+
 		String accessToken = getAccessToken(email);
-		AdPayloadDTO adPayload = GoogleUtils.constructAdPayload(adGroupId, title, imageUrl, finalUrl, phoneNumber);
+		AdPayloadDTO adPayload = GoogleUtils.constructAdPayload(adType, adGroupId, title, description, imageUrl,
+				finalUrl, videoId, productId, businessName, callToAction, phoneNumber, countryCode, appId, appStore);
 		String ad = googleApiConnector.createAd(accessToken, customerId, adPayload);
 		return ad;
 	}
