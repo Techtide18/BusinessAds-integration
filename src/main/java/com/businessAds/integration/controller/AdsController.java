@@ -50,13 +50,37 @@ public class AdsController {
 		return new ResponseEntity<>(adGroupResponse, HttpStatus.OK);
 	}
 
+	/**
+	 * Type of Ads -> Required Fields
+	 *
+	 * 1. Search Ads:title (headlinePart1), description, finalUrl
+	 * 2. Display Ads: title (headline), imageUrl (marketingImage), finalUrl, businessName, callToAction
+	 * 3. Video Ads: videoId, finalUrl
+	 * 4. Shopping Ads: productId, finalUrl
+	 * 5. Responsive Ads: title (headline), description, finalUrl
+	 * 6. Call-Only Ads: businessName, phoneNumber, countryCode, title (headline1), description (description1)
+	 * 7. App Promotion Ads: appId, appStore, title (headline), description, finalUrl
+	 */
 	@PostMapping("/google/create-ad")
-	public ResponseEntity<?> createAd(@RequestParam("email") String email, @RequestParam("title") String title,
-			@RequestHeader("customerId") String customerId, @RequestHeader("adGroupId") String adGroupId,
-			@RequestHeader("imageUrl") String imageUrl, @RequestHeader("finalUrl") String finalUrl,
-			@RequestHeader("phoneNumber") String phoneNumber) {
-		String adResponse = googleAdsService.createAd(email, customerId, adGroupId, title, imageUrl, finalUrl,
-				phoneNumber);
+	public ResponseEntity<?> createAd(@RequestParam("email") String email,
+			@RequestParam(value = "ad_type") String adType,
+			@RequestHeader(value = "customerId", required = false) String customerId,
+			@RequestHeader(value = "adGroupId", required = false) String adGroupId,
+			@RequestHeader(value = "title", required = false) String title,
+			@RequestHeader(value = "description", required = false) String description,
+			@RequestHeader(value = "imageUrl", required = false) String imageUrl,
+			@RequestHeader(value = "finalUrl", required = false) String finalUrl,
+			@RequestHeader(value = "videoId", required = false) String videoId,
+			@RequestHeader(value = "productId", required = false) String productId,
+			@RequestHeader(value = "businessName", required = false) String businessName,
+			@RequestHeader(value = "callToAction", required = false) String callToAction,
+			@RequestHeader(value = "phoneNumber", required = false) String phoneNumber,
+			@RequestHeader(value = "countryCode", required = false) String countryCode,
+			@RequestHeader(value = "appId", required = false) String appId,
+			@RequestHeader(value = "appStore", required = false) String appStore) {
+		String adResponse = googleAdsService.createAd(email, adType, customerId, adGroupId, title, description,
+				imageUrl, finalUrl, videoId, productId, businessName, callToAction, phoneNumber, countryCode, appId,
+				appStore);
 		return new ResponseEntity<>(adResponse, HttpStatus.OK);
 	}
 
