@@ -1,8 +1,9 @@
 package com.businessAds.integration.connectors;
 
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
-import com.businessAds.integration.dto.google.GoogleTokenDTO;
-import com.businessAds.integration.dto.google.ResourceNamesDTO;
+import com.businessAds.integration.dto.google.*;
+import com.businessAds.integration.utils.GoogleUtils;
+import com.google.auth.oauth2.GoogleAuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -11,6 +12,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.IOException;
 
 @Service
 public class GoogleApiConnector {
@@ -38,6 +41,18 @@ public class GoogleApiConnector {
 
 	@Value("${google.customers.url}")
 	private String customersUri;
+
+	@Value("${google.campaign.budget.url}")
+	private String campaignBudgetUri;
+
+	@Value("${google.campaign.url}")
+	private String campaignUri;
+
+	@Value("${google.adGroup.url}")
+	private String adGroupUri;
+
+	@Value("${google.ads.url}")
+	private String adsUri;
 
 	@Value("${google.developer.token}")
 	private String GOOGLE_DEV_TOKEN;
@@ -86,4 +101,53 @@ public class GoogleApiConnector {
 		return responseEntity != null ? responseEntity.getBody() : null;
 
 	}
+
+	public String createBudget(String accessToken, String customerId, BudgetPayloadDTO budgetPayloadDTO) {
+
+		String url = campaignBudgetUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
+		HttpEntity<?> httpEntity = new HttpEntity<>(budgetPayloadDTO, headers);
+
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
+		return responseEntity != null ? responseEntity.getBody() : null;
+	}
+
+	public String createCampaign(String accessToken, String customerId, CampaignPayloadDTO campaignPayloadDTO) {
+
+		String url = campaignUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<?> entity = new HttpEntity<>(campaignPayloadDTO, headers);
+
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+		return responseEntity != null ? responseEntity.getBody() : null;
+	}
+
+	public String createAdGroup(String accessToken, String customerId, AdGroupPayloadDTO adGroupPayloadDTO) {
+
+		String url = adGroupUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<?> entity = new HttpEntity<>(adGroupPayloadDTO, headers);
+
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+		return responseEntity != null ? responseEntity.getBody() : null;
+	}
+
+	public String createAd(String accessToken, String customerId, AdPayloadDTO adPayload) {
+
+		String url = adsUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<?> entity = new HttpEntity<>(adPayload, headers);
+
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+		return responseEntity != null ? responseEntity.getBody() : null;
+	}
+
 }
