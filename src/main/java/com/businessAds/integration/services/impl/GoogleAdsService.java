@@ -6,6 +6,7 @@ import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.controller.AuthController;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.*;
+import com.businessAds.integration.enums.GoogleResponseContentType;
 import com.businessAds.integration.pojo.ClientInformation;
 import com.businessAds.integration.services.RedisService;
 import com.businessAds.integration.utils.GoogleUtils;
@@ -24,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -99,8 +102,11 @@ public class GoogleAdsService {
 
 	public String createBudget(String email, String customerId, long amountMicros) {
 		String accessToken = getAccessToken(email);
+
 		BudgetPayloadDTO budgetPayloadDTO = new BudgetPayloadDTO("Test Budget", amountMicros, "STANDARD");
-		String budget = googleApiConnector.createBudget(accessToken, customerId, budgetPayloadDTO);
+		GoogleBaseDTO.CreateOperation createOperation = new GoogleBaseDTO.CreateOperation(budgetPayloadDTO);
+		GoogleBaseDTO googleBaseDTO = new GoogleBaseDTO<>(List.of(createOperation));
+		String budget = googleApiConnector.createBudget(accessToken, customerId, googleBaseDTO);
 		return budget;
 	}
 

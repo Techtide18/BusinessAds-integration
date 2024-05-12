@@ -102,7 +102,7 @@ public class GoogleApiConnector {
 
 	}
 
-	public String createBudget(String accessToken, String customerId, BudgetPayloadDTO budgetPayloadDTO) {
+	public String createBudget(String accessToken, String customerId, GoogleBaseDTO budgetPayloadDTO) {
 
 		String url = campaignBudgetUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
 		HttpHeaders headers = new HttpHeaders();
