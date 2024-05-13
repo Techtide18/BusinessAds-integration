@@ -96,7 +96,6 @@ public class GoogleApiConnector {
 		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
 		headers.add(BusinessAdsCommonConstants.DEVELOPER_TOKEN, GOOGLE_DEV_TOKEN);
 		HttpEntity<String> entity = new HttpEntity<>(headers);
-
 		ResponseEntity<ResourceNamesDTO> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
 				ResourceNamesDTO.class);
 		return responseEntity != null ? responseEntity.getBody() : null;
@@ -106,7 +105,6 @@ public class GoogleApiConnector {
 	public GoogleResultDTO createBudget(String accessToken, String customerId, GoogleBaseDTO<CreateOperationDTO<?>>
 			budgetPayloadDTO) {
 		String url = campaignBudgetUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
-		BudgetPayloadDTO budgetPayloadDTO2 = new BudgetPayloadDTO("Test Budget", 5000, "STANDARD");
 		HttpHeaders headers = GoogleUtils.getGoogleHeaders(accessToken, "5216290242", GOOGLE_DEV_TOKEN);
 		HttpEntity<GoogleBaseDTO<CreateOperationDTO<?>>> httpEntity = new HttpEntity<>(budgetPayloadDTO, headers);
 		ResponseEntity<GoogleResultDTO> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, GoogleResultDTO.class);
