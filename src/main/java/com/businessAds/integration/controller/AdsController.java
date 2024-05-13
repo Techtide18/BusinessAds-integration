@@ -1,9 +1,9 @@
 package com.businessAds.integration.controller;
 
+import com.businessAds.integration.dto.google.BudgetDTO;
+import com.businessAds.integration.dto.google.GoogleResultDTO;
 import com.businessAds.integration.dto.google.ResourceNamesDTO;
 import com.businessAds.integration.services.impl.GoogleAdsService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +30,11 @@ public class AdsController {
 	}
 
 	@PostMapping("/google/create-budget")
-	public ResponseEntity<?> createBudget(@RequestParam("email") String email,
-			@RequestHeader("customerId") String customerId, @RequestHeader("amountMicros") long amountMicros) {
-		String budgetResponse = googleAdsService.createBudget(email, customerId, amountMicros);
+	public ResponseEntity<?> createBudget(
+			@RequestBody BudgetDTO budgetDTO,
+			@RequestParam(value = "email", required = true) String email,
+			@RequestHeader(value = "customerId", required = true) String customerId) {
+		GoogleResultDTO budgetResponse = googleAdsService.createBudget(email, customerId, budgetDTO);
 		return new ResponseEntity<>(budgetResponse, HttpStatus.OK);
 	}
 

@@ -22,5 +22,6 @@ public class BusinessAdsCommonConstants {
 	public static final String DEVELOPER_TOKEN = "developer-token";
 	public static final String GOOGLE = "_Google";
 	public static final String CUSTOMER_ID = "customerId";
+	public static final String LOGIN_CUSTOMER_ID = "login-customer-id";
 
 }

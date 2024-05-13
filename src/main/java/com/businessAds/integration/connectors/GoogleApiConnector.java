@@ -7,6 +7,7 @@ import com.google.auth.oauth2.GoogleAuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -102,16 +103,15 @@ public class GoogleApiConnector {
 
 	}
 
-	public String createBudget(String accessToken, String customerId, GoogleBaseDTO budgetPayloadDTO) {
-
+	public GoogleResultDTO createBudget(String accessToken, String customerId, GoogleBaseDTO<CreateOperationDTO<?>>
+			budgetPayloadDTO) {
 		String url = campaignBudgetUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
-		HttpEntity<?> httpEntity = new HttpEntity<>(budgetPayloadDTO, headers);
+		BudgetPayloadDTO budgetPayloadDTO2 = new BudgetPayloadDTO("Test Budget", 5000, "STANDARD");
+		HttpHeaders headers = GoogleUtils.getGoogleHeaders(accessToken, "5216290242", GOOGLE_DEV_TOKEN);
+		HttpEntity<GoogleBaseDTO<CreateOperationDTO<?>>> httpEntity = new HttpEntity<>(budgetPayloadDTO, headers);
+		ResponseEntity<GoogleResultDTO> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, GoogleResultDTO.class);
 
-		ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
-		return responseEntity != null ? responseEntity.getBody() : null;
+		return responseEntity.getBody();
 	}
 
 	public String createCampaign(String accessToken, String customerId, CampaignPayloadDTO campaignPayloadDTO) {

@@ -3,14 +3,10 @@ package com.businessAds.integration.services.impl;
 import com.businessAds.integration.auth.service.GoogleOAuthClient;
 import com.businessAds.integration.connectors.GoogleApiConnector;
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
-import com.businessAds.integration.controller.AuthController;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.*;
-import com.businessAds.integration.enums.GoogleResponseContentType;
 import com.businessAds.integration.pojo.ClientInformation;
-import com.businessAds.integration.services.RedisService;
 import com.businessAds.integration.utils.GoogleUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import com.nimbusds.jwt.JWT;
@@ -18,15 +14,9 @@ import com.nimbusds.jwt.JWTParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -100,14 +90,12 @@ public class GoogleAdsService {
 		return adAccounts;
 	}
 
-	public String createBudget(String email, String customerId, long amountMicros) {
+	public GoogleResultDTO createBudget(String email, String customerId, BudgetDTO budgetDTO) {
 		String accessToken = getAccessToken(email);
-
-		BudgetPayloadDTO budgetPayloadDTO = new BudgetPayloadDTO("Test Budget", amountMicros, "STANDARD");
-		GoogleBaseDTO.CreateOperation createOperation = new GoogleBaseDTO.CreateOperation(budgetPayloadDTO);
-		GoogleBaseDTO googleBaseDTO = new GoogleBaseDTO<>(List.of(createOperation));
-		String budget = googleApiConnector.createBudget(accessToken, customerId, googleBaseDTO);
-		return budget;
+		GoogleBaseDTO<CreateOperationDTO<?>> googleBaseDTO = GoogleUtils.getSingleGoogleCreateOperation(budgetDTO);
+		GoogleResultDTO resultDTO = googleApiConnector.createBudget(accessToken, customerId, googleBaseDTO);
+		// save all results id in DB with respect to customer id
+		return resultDTO;
 	}
 
 	public String createCampaign(String email, String customerId, String budgetId) {
