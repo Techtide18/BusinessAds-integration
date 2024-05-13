@@ -1,8 +1,17 @@
 package com.businessAds.integration.utils;
 
+import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dto.google.AdPayloadDTO;
+import com.businessAds.integration.dto.google.BudgetDTO;
+import com.businessAds.integration.dto.google.CreateOperationDTO;
+import com.businessAds.integration.dto.google.GoogleBaseDTO;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Stack;
 
 public class GoogleUtils {
 
@@ -84,6 +93,22 @@ public class GoogleUtils {
 	//Responsive Ads: Ads that automatically adjust their size, appearance, and format to fit available ad spaces.
 	//Call-Only Ads: Ads designed to encourage phone calls to your business.
 	//App Promotion Ads: Ads that promote app installations and engagement.
+
+	//5216290242 USDnI2NhsnWvQFezdmUe_g
+	public static HttpHeaders getGoogleHeaders(String accessToken, String loginCustomerId, String developerToken) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
+		headers.add(BusinessAdsCommonConstants.LOGIN_CUSTOMER_ID, loginCustomerId);
+		headers.add(BusinessAdsCommonConstants.DEVELOPER_TOKEN, developerToken);
+		return headers;
+	}
+
+	public static GoogleBaseDTO<CreateOperationDTO<?>> getSingleGoogleCreateOperation(Object object) {
+		CreateOperationDTO<?> createOperation = new CreateOperationDTO<>(object);
+		return new GoogleBaseDTO<>(List.of(createOperation));
+	}
+
 }
 
 

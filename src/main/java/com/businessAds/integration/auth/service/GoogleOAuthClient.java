@@ -36,7 +36,8 @@ public class GoogleOAuthClient {
 	private AccessTokenService accessTokenService;
 
 	public String getAccessToken(String email) {
-		AccessToken accessTokenFromRedis = accessTokenService.getAccessTokenFromRedis(email);
+		String key = email + BusinessAdsCommonConstants.GOOGLE;
+		AccessToken accessTokenFromRedis = accessTokenService.getAccessTokenFromRedis(key);
 		if (accessTokenFromRedis == null) {
 			ClientInformation clientInfo = clientInformationRepository.findByEmail(email);
 			GoogleTokenDTO accessTokenResponse = getAccessTokenResponseBody(clientInfo.getRefreshToken());
@@ -46,7 +47,7 @@ public class GoogleOAuthClient {
 			}
 			return null;
 		}
-		return accessTokenFromRedis.getAccessToken();
+		return BusinessAdsCommonConstants.BEARER_PREFIX + accessTokenFromRedis.getAccessToken();
 	}
 
 	private GoogleTokenDTO getAccessTokenResponseBody(String refreshToken) {

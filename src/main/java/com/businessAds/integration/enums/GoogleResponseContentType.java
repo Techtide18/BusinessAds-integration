@@ -4,5 +4,4 @@ public enum GoogleResponseContentType {
     UNSPECIFIED,
     RESOURCE_NAME_ONLY,
     MUTABLE_RESOURCE
-
 }
