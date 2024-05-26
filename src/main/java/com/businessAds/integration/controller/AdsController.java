@@ -26,6 +26,7 @@ public class AdsController {
 	@GetMapping("/google/account")
 	public ResponseEntity<?> getAdAccounts(@RequestParam("email") String email) {
 		ResourceNamesDTO adAccounts = googleAdsService.getAdAccounts(email);
+		System.out.println(adAccounts);
 		return new ResponseEntity<>(adAccounts, HttpStatus.OK);
 	}
 
