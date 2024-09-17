@@ -112,15 +112,14 @@ public class GoogleApiConnector {
 		return responseEntity.getBody();
 	}
 
-	public String createCampaign(String accessToken, String customerId, CampaignPayloadDTO campaignPayloadDTO) {
+	public String createCampaign(String accessToken, String customerId, CampaignDto campaignPayloadDTO) {
 
 		String url = campaignUri.replace(BusinessAdsCommonConstants.CUSTOMER_ID, customerId);
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(BusinessAdsCommonConstants.AUTHORIZATION, accessToken);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<?> entity = new HttpEntity<>(campaignPayloadDTO, headers);
+		HttpHeaders headers = GoogleUtils.getGoogleHeaders(accessToken, "5216290242", GOOGLE_DEV_TOKEN);
+		GoogleBaseDTO<CreateOperationDTO<?>> googleBaseDTO = GoogleUtils.getSingleGoogleCreateOperation(campaignPayloadDTO);
+		HttpEntity<GoogleBaseDTO<CreateOperationDTO<?>>> httpEntity = new HttpEntity<>(googleBaseDTO, headers);
 
-		ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
 		return responseEntity != null ? responseEntity.getBody() : null;
 	}
 

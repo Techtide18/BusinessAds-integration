@@ -5,6 +5,7 @@ import com.businessAds.integration.connectors.GoogleApiConnector;
 import com.businessAds.integration.constants.BusinessAdsCommonConstants;
 import com.businessAds.integration.dao.ClientInformationRepository;
 import com.businessAds.integration.dto.google.*;
+import com.businessAds.integration.enums.CampaignEnums;
 import com.businessAds.integration.pojo.ClientInformation;
 import com.businessAds.integration.utils.GoogleUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -95,15 +96,22 @@ public class GoogleAdsService {
 		GoogleBaseDTO<CreateOperationDTO<?>> googleBaseDTO = GoogleUtils.getSingleGoogleCreateOperation(budgetDTO);
 		GoogleResultDTO resultDTO = googleApiConnector.createBudget(accessToken, customerId, googleBaseDTO);
 		// save all results id in DB with respect to customer id
+		//createCampaign(email, customerId, resultDTO.getResults().get(0).getResourceName());
+		// save the result dto in table with respect to customer id
 		return resultDTO;
 	}
 
 	public String createCampaign(String email, String customerId, String budgetId) {
 		String accessToken = getAccessToken(email);
-		BiddingStrategyConfigurationDTO biddingStrategyConfig = new BiddingStrategyConfigurationDTO("MANUAL_CPC");
-		CampaignPayloadDTO campaignPayloadDTO = new CampaignPayloadDTO("Test Campaign", "SEARCH", "PAUSED", budgetId,
-				biddingStrategyConfig);
-		String campaign = googleApiConnector.createCampaign(accessToken, customerId, campaignPayloadDTO);
+//		BiddingStrategyConfigurationDTO biddingStrategyConfig = new BiddingStrategyConfigurationDTO("MANUAL_CPC");
+//		CampaignPayloadDTO campaignPayloadDTO = new CampaignPayloadDTO("Test Campaign", "SEARCH", "PAUSED", budgetId,
+//				biddingStrategyConfig);
+		CampaignDto campaignDTO = new CampaignDto();
+		campaignDTO.setName("New Campaign");
+		campaignDTO.setStatus(CampaignEnums.CampaignStatus.ENABLED.name());
+		campaignDTO.setAdvertisingChannelType(CampaignEnums.AdvertisingChannelType.SEARCH.name());
+		campaignDTO.setCampaignBudget(budgetId);
+		String campaign = googleApiConnector.createCampaign(accessToken, customerId, campaignDTO);
 		return campaign;
 	}
 
